@@ -1,0 +1,160 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="weather"
+            type="org.openweathermap.model.WeatherCurrent" />
+
+        <import type="java.lang.String" />
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.mirhoseini.autolabs.weather.WeatherFragment">
+
+        <LinearLayout
+            android:id="@+id/progress_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/progress_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="loading" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/error_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <android.support.v7.widget.AppCompatImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_sync_problem" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/weather_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|bottom"
+                android:paddingTop="10dp"
+                android:text="@{weather.name}"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                tools:text="name" />
+
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|top"
+                android:paddingBottom="5dp"
+                android:text="@{weather.weather.get(0).description}"
+                tools:text="description" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/icon"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:padding="10dp"
+                app:srcCompat="@drawable/ic_moon"
+                app:weatherIcon="@{weather.weather.get(0).icon}" />
+
+            <TextView
+                android:id="@+id/temp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal|top"
+                android:text='@{String.valueOf(weather.main.temp) + "°C"}'
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                tools:text="25 °C" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:srcCompat="@drawable/ic_wind"
+                    android:layout_weight="1"
+                    android:scaleType="fitEnd" />
+
+                <TextView
+                    android:id="@+id/windspeed"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text='@{String.valueOf(weather.wind.speed)+" m/s"}'
+                    tools:text="5 m/s" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:srcCompat="@drawable/ic_temperature_high"
+                    android:layout_weight="1"
+                    android:scaleType="fitEnd" />
+
+                <TextView
+                    android:id="@+id/temp_high"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text='@{String.valueOf(weather.main.tempMax)+ " °C"}'
+                    tools:text="10 °C" />
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    app:srcCompat="@drawable/ic_temperature_low"
+                    android:layout_weight="1"
+                    android:scaleType="fitEnd" />
+
+                <TextView
+                    android:id="@+id/temp_low"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text='@{String.valueOf(weather.main.tempMin)+ " °C"}'
+                    tools:text="-10 °C" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+</layout>

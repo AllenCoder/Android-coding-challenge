@@ -1,0 +1,3 @@
+include ':autolabs-app', ':autolabs-core'
+project(':autolabs-app').projectDir = new File('app')
+project(':autolabs-core').projectDir = new File('core-lib')
