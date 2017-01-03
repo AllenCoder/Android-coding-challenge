@@ -52,7 +52,11 @@ public abstract class AutolabsApplication extends Application {
 
         initApplication();
 
-        component = DaggerApplicationComponent.builder()
+        component = createComponent();
+    }
+
+    public ApplicationComponent createComponent() {
+        return DaggerApplicationComponent.builder()
                 .androidModule(getAndroidModule())
                 .build();
     }

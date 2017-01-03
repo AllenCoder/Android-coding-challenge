@@ -23,8 +23,8 @@ import rx.subscriptions.Subscriptions;
 @Weather
 public class WeatherPresenterImpl implements WeatherPresenter {
 
-    WeatherInteractor interactor;
-    StateManager stateManager;
+    private WeatherInteractor interactor;
+    private StateManager stateManager;
     private WeatherView view;
     private Subscription subscription = Subscriptions.empty();
     private SchedulerProvider scheduler;
@@ -72,10 +72,11 @@ public class WeatherPresenterImpl implements WeatherPresenter {
                         throwable -> {
                             if (stateManager.isConnect()) {
                                 if (view != null) {
+
+                                    // TODO: 04/01/2017 handle exceptions using separate Exception classes
                                     if (throwable.getClass().equals(NoSuchElementException.class)) {
                                         view.showToastMessage("City not found!!!");
                                     } else {
-//                                view.showToastMessage(throwable.getMessage());
                                         view.showRetryMessage(throwable);
                                     }
                                 }

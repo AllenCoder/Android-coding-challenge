@@ -190,22 +190,6 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
 
             binding.setVariable(BR.weather, weather);
             binding.executePendingBindings();
-
-//            Weather weather = weather.getWeather().get(0);
-//
-//            mNameTextView.setText(weather.getName());
-//
-//            mDescriptionTextView.setText(weather.getDescription());
-//
-//            mTempTextView.setText(weather.getMain().getTemp() + "°C");
-//
-//            mIconImageView.setImageResource(WeatherUtils.convertIconToResource(weather.getIcon()));
-//
-//            mWindSpeedTextView.setText(weather.getWind().getSpeed() + "m/s");
-//
-//            mTempHighTextView.setText(weather.getMain().getTempMax() + "°C");
-//
-//            mTempLowTextView.setText(weather.getMain().getTempMin() + "°C");
         } else {
             errorContainer.setVisibility(View.VISIBLE);
         }
