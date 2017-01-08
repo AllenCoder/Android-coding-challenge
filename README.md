@@ -38,13 +38,13 @@ This application was created by [Mohsen Mirhoseini Argi](http://mirhoseini.com),
 * jUnit v4.12
 * Android Support Test v0.5
 * Mockito v1.10.19
-* Robolectric v3.1-rc1
+* Robolectric v3.1.1
 * Espresso v2.2.2
 
 --------------------
 ### Important Notes ###
 
-The application has on Activity, MainActivity. The MainActivity is consist of a search UI and a Fragment, WeatherFragment, which is responsible for presenting searched city current weather.
+The application has one Activity, MainActivity. The MainActivity is consist of a search UI and a Fragment, WeatherFragment, which is responsible for presenting searched city current weather.
 
 All activity lifecycle and network behaviours are implemented, and according to device size and network situation user get a good UI and UX. If no internet connection or network error, a Snackbar pops up and ask user to turn on network connection or retry.
 
@@ -58,7 +58,7 @@ Whole application functionality is implemented in "Core-Lib" module using pure J
 
 The **view** (MainActivity), contain one fragment. WeatherFragment contain its own presenter and implement View interfaces and the only thing that the view will do is calling a method from the presenter every time there is an interface action.
 
-The **presenter** (WeatherPresenters, is responsible to act as the middle man between view and model. It retrieves data from the Model and returns it formatted to the view. It also decides what happens when user interact with the view.
+The **presenter** (WeatherPresenter), is responsible to act as the middle man between view and model. It retrieves data from the Model and returns it formatted to the view. It also decides what happens when user interact with the view.
 
 The **models** (WeatherInteractor), would only be the gateway to the service domain layer or business logic. In this case it provide the data needed to be displayed in the view from Network.
 
@@ -70,7 +70,7 @@ Dependency Injections are being managed by [Dagger](https://github.com/google/da
 
 ![Diagram](diagram.png)
 
-It was my first experience with Speech Recognition Applications, so after a research I prefered to use Android SpeechRecognizer service, however, I know that this part is not so professional and require more changes.  
+It was my first experience with Speech Recognition Applications, so after a research I preferred to use Android SpeechRecognizer service, however, I know that this part is not so professional and require more changes.  
 
 Some minor Android common functions are managed using [AndroidUtils](https://github.com/mmirhoseini/android_utils) library, developed and published on jCenter by [myself](http://mirhoseini.com).
 
