@@ -10,8 +10,6 @@ import javax.inject.Inject;
 
 import retrofit2.Response;
 import rx.Observable;
-import rx.Subscription;
-import rx.subjects.ReplaySubject;
 
 /**
  * Created by Mohsen on 03/01/2017.

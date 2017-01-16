@@ -2,6 +2,7 @@ package com.mirhoseini.autolabs;
 
 import com.mirhoseini.autolabs.service.ApiModule;
 import com.mirhoseini.autolabs.service.ClientModule;
+import com.mirhoseini.autolabs.speech.SpeechModule;
 
 import javax.inject.Singleton;
 
@@ -16,7 +17,8 @@ import dagger.Component;
         AndroidModule.class,
         ApplicationModule.class,
         ApiModule.class,
-        ClientModule.class
+        ClientModule.class,
+        SpeechModule.class,
 })
 public interface ApplicationTestComponent extends ApplicationComponent {
 

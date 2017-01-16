@@ -22,6 +22,9 @@ import com.mirhoseini.autolabs.base.BaseFragment;
 
 import org.openweathermap.model.WeatherCurrent;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -54,10 +57,10 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
     ViewGroup weatherContainer;
 
     private CompositeSubscription compositeSubscription = new CompositeSubscription();
-    private BehaviorSubject<String[]> citySubject = BehaviorSubject.create();
+    private BehaviorSubject<ArrayList<String>> citySubject = BehaviorSubject.create();
 
     private ViewDataBinding binding;
-    private String[] cities;
+    private ArrayList<String> cities;
 
     public WeatherFragment() {
         // Required empty public constructor
@@ -77,7 +80,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
 
         if (getArguments() != null) {
             String city = getArguments().getString(ARG_CITY);
-            citySubject.onNext(new String[]{city});
+            citySubject.onNext(new ArrayList<>(Arrays.asList(new String[]{city})));
         }
     }
 
@@ -101,7 +104,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
         );
     }
 
-    private void loadWeather(String[] cities) {
+    private void loadWeather(ArrayList<String> cities) {
         this.cities = cities;
 
         presenter.loadWeather(cities);
@@ -218,7 +221,7 @@ public class WeatherFragment extends BaseFragment implements WeatherView {
                 .show();
     }
 
-    public BehaviorSubject<String[]> getCitySubject() {
+    public BehaviorSubject<ArrayList<String>> getCitySubject() {
         return citySubject;
     }
 }

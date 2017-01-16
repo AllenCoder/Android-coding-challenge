@@ -6,7 +6,6 @@ import com.mirhoseini.autolabs.base.BaseInteractor;
 import org.openweathermap.model.WeatherCurrent;
 
 import retrofit2.Response;
-
 import rx.Observable;
 
 /**

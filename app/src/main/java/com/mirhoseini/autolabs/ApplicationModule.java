@@ -26,7 +26,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     @Named("isDebug")
-    public boolean provideIsDebug() {
+    boolean provideIsDebug() {
         return BuildConfig.DEBUG;
     }
 
@@ -39,13 +39,13 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public HttpUrl provideEndpoint() {
+    HttpUrl provideEndpoint() {
         return HttpUrl.parse(AppConstants.BASE_URL);
     }
 
     @Provides
     @Singleton
-    public SchedulerProvider provideAppScheduler() {
+    SchedulerProvider provideAppScheduler() {
         return new AppSchedulerProvider();
     }
 
@@ -73,7 +73,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     @Named("retryCount")
-    public int provideApiRetryCount() {
+    int provideApiRetryCount() {
         return AppConstants.API_RETRY_COUNT;
     }
 
@@ -86,7 +86,7 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    public StateManager provideStateManager(StateManagerImpl stateManager) {
+    StateManager provideStateManager(StateManagerImpl stateManager) {
         return stateManager;
     }
 

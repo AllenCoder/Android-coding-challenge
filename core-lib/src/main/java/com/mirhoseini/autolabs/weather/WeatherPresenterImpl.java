@@ -6,6 +6,7 @@ import com.mirhoseini.autolabs.util.StateManager;
 import org.openweathermap.model.WeatherCurrent;
 
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
@@ -50,7 +51,7 @@ public class WeatherPresenterImpl implements WeatherPresenter {
     }
 
     @Override
-    public void loadWeather(String[] cities) {
+    public void loadWeather(ArrayList<String> cities) {
         if (view != null) {
             view.showProgress();
             view.updateProgressMessage("Loading City Weather...");
@@ -61,7 +62,7 @@ public class WeatherPresenterImpl implements WeatherPresenter {
                         .filter(this::checkWeatherCurrentResponseValidation)
                         .onErrorResumeNext(Observable.empty()))
                 .first()
-                .map(weatherCurrentResponse -> weatherCurrentResponse.body())
+                .map(Response::body)
                 .observeOn(scheduler.mainThread())
                 .subscribe(
                         weatherCurrent -> {
@@ -104,8 +105,8 @@ public class WeatherPresenterImpl implements WeatherPresenter {
             result = null != weatherCurrentResponse
                     && weatherCurrentResponse.isSuccessful()
                     && null != weatherCurrentResponse.body()
-                    // Unfortunately OpenWeatherMap.org api answer any query even if it is not a city name!!! :/
-                    // so, I temporarily solve the issue with checking if the answer is the same as request.
+                    // Unfortunately OpenWeatherMap.org api answer any query even if it is not a city name!!! :(
+                    // so, I temporarily solve the issue with checking if the response city name is the same as request.
                     && URLDecoder.decode(weatherCurrentResponse.raw().request().url().toString().split("/?q=")[1].split("&")[0], "UTF-8").equalsIgnoreCase(weatherCurrentResponse.body().getName());
         } catch (Exception e) {
             Exceptions.propagate(e);

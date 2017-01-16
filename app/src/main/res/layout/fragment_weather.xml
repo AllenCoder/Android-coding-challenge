@@ -107,10 +107,10 @@
                 <android.support.v7.widget.AppCompatImageView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    app:srcCompat="@drawable/ic_wind"
                     android:layout_weight="1"
-                    android:scaleType="fitEnd" />
+                    android:padding="8dp"
+                    android:scaleType="fitEnd"
+                    app:srcCompat="@drawable/ic_wind" />
 
                 <TextView
                     android:id="@+id/windspeed"
@@ -124,10 +124,10 @@
                 <android.support.v7.widget.AppCompatImageView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    app:srcCompat="@drawable/ic_temperature_high"
                     android:layout_weight="1"
-                    android:scaleType="fitEnd" />
+                    android:padding="8dp"
+                    android:scaleType="fitEnd"
+                    app:srcCompat="@drawable/ic_temperature_high" />
 
                 <TextView
                     android:id="@+id/temp_high"
@@ -141,10 +141,10 @@
                 <android.support.v7.widget.AppCompatImageView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    app:srcCompat="@drawable/ic_temperature_low"
                     android:layout_weight="1"
-                    android:scaleType="fitEnd" />
+                    android:padding="8dp"
+                    android:scaleType="fitEnd"
+                    app:srcCompat="@drawable/ic_temperature_low" />
 
                 <TextView
                     android:id="@+id/temp_low"

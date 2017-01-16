@@ -3,13 +3,9 @@ package com.mirhoseini.autolabs;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -25,11 +21,14 @@ import android.widget.Toast;
 
 import com.mirhoseini.appsettings.AppSettings;
 import com.mirhoseini.autolabs.base.BaseActivity;
+import com.mirhoseini.autolabs.speech.AppSpeechView;
+import com.mirhoseini.autolabs.speech.SpeechProvider;
 import com.mirhoseini.autolabs.util.Constants;
 import com.mirhoseini.autolabs.weather.WeatherFragment;
 import com.mirhoseini.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 
@@ -46,13 +45,15 @@ import timber.log.Timber;
  * Created by Mohsen on 03/01/2017.
  */
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements AppSpeechView {
 
     public static final String TAG_CURRENT_FRAGMENT = "current_fragment";
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1;
 
     @Inject
     Context context;
+    @Inject
+    SpeechProvider speechProvider;
 
     //injecting views via ButterKnife
     @BindView(R.id.city)
@@ -64,7 +65,6 @@ public class MainActivity extends BaseActivity {
 
     private WeatherFragment weatherFragment;
     private AlertDialog internetConnectionDialog;
-    private SpeechRecognizer speechRecognizer;
 
     private CompositeSubscription compositeSubscription = new CompositeSubscription();
     private BehaviorSubject<Boolean> noInternetSubject = BehaviorSubject.create();
@@ -83,7 +83,7 @@ public class MainActivity extends BaseActivity {
         //hide keyboard for better UX
         Utils.hideKeyboard(context, city);
 
-        weatherFragment.getCitySubject().onNext(new String[]{city.getText().toString().trim()});
+        weatherFragment.getCitySubject().onNext(new ArrayList<>(Arrays.asList(new String[]{city.getText().toString().trim()})));
     }
 
     @OnTouch(R.id.talk)
@@ -95,29 +95,17 @@ public class MainActivity extends BaseActivity {
             case MotionEvent.ACTION_DOWN:
                 talk.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red_A200));
 
-                startSpeechRecognizer();
+                speechProvider.startSpeechRecognizer();
                 break;
             case MotionEvent.ACTION_UP:
                 talk.setColorFilter(Color.WHITE);
 
-                stopSpeechRecognizer();
+                speechProvider.stopSpeechRecognizer();
                 break;
         }
         return true;
     }
 
-    private void stopSpeechRecognizer() {
-        speechRecognizer.stopListening();
-    }
-
-    private void startSpeechRecognizer() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, "voice.recognition.test");
-
-        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
-        speechRecognizer.startListening(intent);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,8 +115,9 @@ public class MainActivity extends BaseActivity {
         // binding Views using ButterKnife
         ButterKnife.bind(this);
 
+        loadLastLoadedCity(savedInstanceState);
+
         if (null == savedInstanceState) {
-            loadLastLoadedCity();
             createFragments();
             attachFragments();
         } else {
@@ -136,120 +125,7 @@ public class MainActivity extends BaseActivity {
             city.setText(savedInstanceState.getString(Constants.KEY_LAST_CITY));
         }
 
-        // TODO: 04/01/2017 Move SpeechRecognizer to another module for a cleaner code and inject using Dagger
-        setupSpeechRecognizer();
-
         Timber.d("Activity Created");
-    }
-
-    private void setupSpeechRecognizer() {
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        speechRecognizer.setRecognitionListener(new RecognitionListener() {
-            public void onReadyForSpeech(Bundle params) {
-                Timber.d("onReadyForSpeech");
-            }
-
-            public void onBeginningOfSpeech() {
-                Timber.d("onBeginningOfSpeech");
-
-                progress.setVisibility(View.VISIBLE);
-            }
-
-            public void onRmsChanged(float rmsdB) {
-                Timber.d("onRmsChanged:" + rmsdB);
-                talk.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red_A200) - (int) rmsdB * Color.RED);
-            }
-
-            public void onBufferReceived(byte[] buffer) {
-                Timber.d("onBufferReceived");
-            }
-
-            public void onEndOfSpeech() {
-                Timber.d("onEndOfSpeech");
-
-                talk.setColorFilter(Color.WHITE);
-            }
-
-            public void onError(int error) {
-                progress.setVisibility(View.GONE);
-
-                switch (error) {
-                    case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                        requestRecordAudioPermission();
-                        break;
-
-                    case SpeechRecognizer.ERROR_NETWORK:
-                    case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                        Toast.makeText(context, "Speech network error", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                        Toast.makeText(context, "Speech timeout", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                        Toast.makeText(context, "Speech recognizer busy", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    case SpeechRecognizer.ERROR_NO_MATCH:
-                        Toast.makeText(context, "Speech no match", Toast.LENGTH_SHORT).show();
-                        break;
-
-                    default:
-                        Toast.makeText(context, "Error!!!", Toast.LENGTH_SHORT).show();
-
-                }
-                Timber.d("error " + error);
-            }
-
-            public void onResults(Bundle results) {
-                talk.setColorFilter(Color.WHITE);
-                progress.setVisibility(View.GONE);
-
-                Timber.d("onResults " + results);
-                getSpeechPhrases(results);
-            }
-
-            public void onPartialResults(Bundle partialResults) {
-                Timber.d("onPartialResults");
-            }
-
-            public void onEvent(int eventType, Bundle params) {
-                Timber.d("onEvent " + eventType);
-            }
-        });
-    }
-
-    private void getSpeechPhrases(Bundle results) {
-        ArrayList data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-
-        String message = "Recognized and looking for: ";
-        String[] cities = new String[data.size()];
-        for (int i = 0; i < data.size(); i++) {
-            Timber.d("result " + data.get(i));
-            cities[i] = data.get(i).toString();
-
-            message += "\n" + data.get(i).toString();
-        }
-
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-        weatherFragment.getCitySubject().onNext(cities);
-    }
-
-    private void requestRecordAudioPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                Manifest.permission.RECORD_AUDIO)) {
-
-            Toast.makeText(MainActivity.this, "Please give us the access", Toast.LENGTH_SHORT).show();
-
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.RECORD_AUDIO},
-                    PERMISSION_REQUEST_RECORD_AUDIO);
-        } else {
-            ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.RECORD_AUDIO},
-                    PERMISSION_REQUEST_RECORD_AUDIO);
-        }
     }
 
     private void createFragments() {
@@ -271,6 +147,8 @@ public class MainActivity extends BaseActivity {
         AutolabsApplication
                 .getComponent()
                 .inject(this);
+
+        speechProvider.bind(this);
     }
 
     @Override
@@ -284,6 +162,10 @@ public class MainActivity extends BaseActivity {
         );
 
         // dismiss no internet connection dialog in case of getting back from setting and connection fixed
+        mayDismissInternetConnectionDialog();
+    }
+
+    private void mayDismissInternetConnectionDialog() {
         if (internetConnectionDialog != null)
             internetConnectionDialog.dismiss();
     }
@@ -291,22 +173,25 @@ public class MainActivity extends BaseActivity {
     public void showConnectionError(boolean show) {
         Timber.d("Showing Connection Error Message");
 
-        if (show) {
-            if (internetConnectionDialog != null)
-                internetConnectionDialog.dismiss();
+        mayDismissInternetConnectionDialog();
 
+        if (show) {
             internetConnectionDialog = Utils.showNoInternetConnectionDialog(this, false);
-        } else {
-            if (internetConnectionDialog != null)
-                internetConnectionDialog.dismiss();
         }
     }
 
     // load user last successful city
-    private String loadLastLoadedCity() {
+    private String loadLastLoadedCity(Bundle savedInstanceState) {
         Timber.d("Loading Last City");
 
-        String cityName = AppSettings.getString(context, Constants.KEY_LAST_CITY, Constants.CITY_DEFAULT_VALUE);
+        String cityName;
+
+        if (null == savedInstanceState) {
+            cityName = AppSettings.getString(context, Constants.KEY_LAST_CITY, Constants.CITY_DEFAULT_VALUE);
+        } else {
+            cityName = savedInstanceState.getString(Constants.KEY_LAST_CITY);
+        }
+
         city.setText(cityName);
 
         return cityName;
@@ -332,25 +217,73 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    public void showSpeechProgress(boolean show) {
+        if (show) {
+            progress.setVisibility(View.VISIBLE);
+        } else {
+            talk.setColorFilter(Color.WHITE);
+            progress.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void setSpeechRecognized(ArrayList<String> cities) {
+        String message = "Recognized and looking for: ";
+
+        for (String city : cities) {
+            message += "\n" + city;
+        }
+
+        showMessage(message);
+
+        weatherFragment.getCitySubject().onNext(cities);
+    }
+
+    @Override
+    public void setRmsChange(float rmsdB) {
+        talk.setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.red_A200) - (int) rmsdB * Color.RED);
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_REQUEST_RECORD_AUDIO: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     talk.setImageResource(R.drawable.ic_mic);
                     talk.setColorFilter(Color.WHITE);
 
-                    Toast.makeText(this, "Permission was granted", Toast.LENGTH_SHORT).show();
-
+                    showMessage("Permission was granted");
                 } else {
-                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                    showMessage("Permission denied");
 
                     talk.setImageResource(R.drawable.ic_mic_off);
                 }
-                return;
+                break;
             }
         }
+    }
+
+    @Override
+    public void requestRecordAudioPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                Manifest.permission.RECORD_AUDIO)) {
+
+            showMessage("Please give us the access");
+
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    PERMISSION_REQUEST_RECORD_AUDIO);
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    PERMISSION_REQUEST_RECORD_AUDIO);
+        }
+    }
+
+    @Override
+    public void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     public BehaviorSubject<Boolean> getNoInternetSubject() {
@@ -359,5 +292,12 @@ public class MainActivity extends BaseActivity {
 
     public BehaviorSubject<String> getSaveCitySubject() {
         return saveCitySubject;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        speechProvider.unbind();
     }
 }

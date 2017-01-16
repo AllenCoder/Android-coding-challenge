@@ -3,13 +3,11 @@ package org.openweathermap.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-
 /**
  * Created by Mohsen on 03/01/2017.
  */
 
-public class Coord{
+public class Coord {
 
     @SerializedName("lon")
     @Expose

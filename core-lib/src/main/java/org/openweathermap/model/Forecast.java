@@ -3,7 +3,6 @@ package org.openweathermap.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +10,7 @@ import java.util.List;
  * Created by Mohsen on 03/01/2017.
  */
 
-public class Forecast{
+public class Forecast {
 
     @SerializedName("dt")
     @Expose

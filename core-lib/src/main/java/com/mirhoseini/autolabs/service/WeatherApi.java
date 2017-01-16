@@ -4,7 +4,6 @@ package com.mirhoseini.autolabs.service;
 import org.openweathermap.model.WeatherCurrent;
 
 import retrofit2.Response;
-
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import rx.Observable;
